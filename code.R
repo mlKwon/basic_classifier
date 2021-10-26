@@ -1,6 +1,7 @@
 library(ISLR)
 library(MASS)
 data("Default")
+
 set.seed(12334)
 train_idx <- sample(seq(Default %>% nrow),size = (Default %>% nrow)*0.8)
 testD <- Default[-train_idx,]
@@ -11,6 +12,8 @@ testY <- testD$default; trainY <- trainD$default
 
 clda_fold_cv <- function(train,y_index,k=10,model=1){
 
+  if(k<2) stop("K-fold should be up to 1!")
+  if(nrow(train)<k) stop("K-fold should be smaller than nrow(train)!")
   # model 1 : logistic, model 2 : lda, model 3 : qda, model 4 : naivebayes 
   
   idx <- sample(seq(train %>% nrow),train %>% nrow)
@@ -44,11 +47,5 @@ clda_fold_cv <- function(train,y_index,k=10,model=1){
 }
 
 ll <- vector("list",4)
-ll <- lapply(1:4,function(x) clda_fold_cv(Default,1,k = 10,model=x))
+ll <- lapply(1:4,function(x) clda_fold_cv(trainD,1,k = 10,model=x))
 sapply(ll,mean) # qda
-
-heart<-read.table("http://www-stat.stanford.edu/~tibs/ElemStatLearn/datasets/SAheart.data",
-                  sep=",",head=T,row.names=1)
-ll_heart <- vector("list",4)
-ll_heart <- lapply(1:4,function(x) clda_fold_cv(heart,10,k = 10,model=x))
-sapply(ll_heart,mean) # lda
