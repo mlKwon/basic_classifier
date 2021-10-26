@@ -19,12 +19,13 @@ clda_fold_cv <- function(train,y_index,k=10,model=1){
   idx <- sample(seq(train %>% nrow),train %>% nrow)
   n <- length(idx)
   t <- seq(0,n,length=k+1)
-  accur <- rep(0,k)
+  accur <- selected_length <- rep(0,k)
   
   for(i in seq(k)){
     start <- as.integer(t[i]+1)
     end <- as.integer(t[i+1])
     selected_idx <- start:end
+    selected_length[i] <- length(selected_idx)
     val_idx <- idx[selected_idx]; val_dat <- train[val_idx,]
     tra_idx <- idx[-selected_idx]; tra_dat <- train[tra_idx,]
 
@@ -43,9 +44,11 @@ clda_fold_cv <- function(train,y_index,k=10,model=1){
       accur[i] <- val_tbl %>% diag %>% sum / val_tbl %>% sum
     }
   }
-  return(accur)
+  
+  
+  return(sum(accur*selected_length)/sum(selected_length))
 }
 
 ll <- vector("list",4)
 ll <- lapply(1:4,function(x) clda_fold_cv(trainD,1,k = 10,model=x))
-sapply(ll,mean) # qda
+ll # lda, qda
