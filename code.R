@@ -32,19 +32,16 @@ clda_fold_cv <- function(train,y_index,k=10,model=1){
     if(model==1){
       tra_fit <- glm(tra_dat[,y_index]~.,data=tra_dat[,-y_index],family=binomial)
       val_tbl <- table(factor(predict(object = tra_fit,newdata=val_dat[,-y_index])>0.5),val_dat[,y_index])
-      accur[i] <- val_tbl %>% diag %>% sum / val_tbl %>% sum
     } else if(model %in% 2:3){
       if(model==2) tra_fit <- lda(tra_dat[,y_index]~.,data=tra_dat[,-y_index]) 
       else tra_fit <- qda(tra_dat[,y_index]~.,data=tra_dat[,-y_index])
       val_tbl <- table(predict(tra_fit,val_dat[,-y_index])$class,val_dat[,y_index])
-      accur[i] <- val_tbl %>% diag %>% sum / val_tbl %>% sum
     } else{
       tra_fit <- naiveBayes(tra_dat[,y_index]~.,data=tra_dat[,-y_index],laplace = 1)
       val_tbl <- table(predict(tra_fit,val_dat[,-y_index]),val_dat[,y_index])
-      accur[i] <- val_tbl %>% diag %>% sum / val_tbl %>% sum
     }
+      accur[i] <- val_tbl %>% diag %>% sum / val_tbl %>% sum
   }
-  
   
   return(sum(accur*selected_length)/sum(selected_length))
 }
